@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Storage;
+
 
 class BrandController extends Controller
 {
@@ -73,20 +73,20 @@ class BrandController extends Controller
         $brand->description = $request->description;
         $brand->status = $request->status;
 
-        if ($request->hasFile('uploads')) {
-            $imagePaths = [];
-            foreach ($request->file('uploads') as $file) {
-                $fileName = Str::random(20) . '.' . $file->getClientOriginalExtension();
-                $file->storeAs('public/images', $fileName);
-                $imagePaths[] = 'storage/images/' . $fileName;
+            if ($request->hasFile('uploads')) {
+                $imagePaths = [];
+                foreach ($request->file('uploads') as $file) {
+                    $fileName = Str::random(20) . '.' . $file->getClientOriginalExtension();
+                    $file->storeAs('public/images', $fileName);
+                    $imagePaths[] = 'storage/images/' . $fileName;
+                }
+                $brand->logo = implode(',', $imagePaths);
             }
-            $brand->logo = implode(',', $imagePaths);
+
+            $brand->save();
+
+            return response()->json(["success" => "Brand updated successfully.", "brand" => $brand, "status" => 200]);
         }
-
-        $brand->save();
-
-        return response()->json(["success" => "Brand updated successfully.", "brand" => $brand, "status" => 200]);
-    }
 
     public function destroy(string $id)
     {
